@@ -34,6 +34,7 @@ func main(){
 	app.Get("/data", getData)
 	app.Get("/edit", getEdit)
 	app.Get("/update/:id", getUpdate)
+	app.Get("/delete/:id", Delete)
 
 	app.Post("/addprocess", postAddItem)
 
@@ -152,20 +153,33 @@ func getUpdate(c *fiber.Ctx) error {
 	}
 	defer rows.Close()
 
-	items := []*Item{}
+
+	var item Item
 	for rows.Next() {
-		var buffer Item
-		err := rows.Scan(&buffer.Id,&buffer.NamaItem,&buffer.HargaItem)
+		err := rows.Scan(&item.Id,&item.NamaItem,&item.HargaItem)
 		if err != nil {
 			return c.SendString(err.Error())
 		}
-		items = append(items, &buffer)
 	}
 
 	return c.Render("views/update", fiber.Map{
-		"Items": &items,
+		"Id": item.Id,
+		"NamaItem": item.NamaItem,
+		"HargaItem": item.HargaItem,
 	})
 }
+
+func Delete(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	_, err := db.Exec("DELETE FROM items WHERE id = ?", id)
+	if err != nil {
+		return c.SendString("Error Deleting Data")
+	}
+
+	return c.Redirect("/")
+}
+
 
 func postAddItem(c *fiber.Ctx) error {
 	nama_item := c.FormValue("nama_item")
