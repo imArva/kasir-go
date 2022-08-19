@@ -37,6 +37,7 @@ func main(){
 	app.Get("/delete/:id", Delete)
 
 	app.Post("/addprocess", postAddItem)
+        app.Post("/editprocess", postEdit)
 
 	log.Fatal(app.Listen(":8080"))
 }
@@ -189,6 +190,22 @@ func postAddItem(c *fiber.Ctx) error {
 		c.SendString("harga harus berupa angka!")
 	}
 	_, err = db.Exec("INSERT INTO items(nama_item,harga_item,jumlah_terjual) VALUES(?,?,?)", nama_item,harga_item_int,0)
+	if err != nil {
+		c.SendString(err.Error())
+	}
+	
+	return c.Redirect("/")
+}
+
+func postEdit(c *fiber.Ctx) error {
+        id := c.FormValue("id")
+	nama_item := c.FormValue("nama_item")
+	harga_item := c.FormValue("harga_item")
+	harga_item_int,err  := strconv.Atoi(harga_item)
+	if err != nil {
+		c.SendString("harga harus berupa angka!")
+	}
+	_, err = db.Exec("UPDATE items SET nama_item=?,harga_item=? WHERE id=?", nama_item,harga_item_int,id)
 	if err != nil {
 		c.SendString(err.Error())
 	}
