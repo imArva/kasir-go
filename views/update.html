@@ -37,7 +37,7 @@
   </nav>
 
   <form action="/editprocess" method="post">
-    <input type="number" value="{{.Id}}" hidden>
+    <input type="number" value="{{.Id}}" name="id" hidden>
     <label for="nama_barang" style="width: 100%; margin-top:20px;"><h4>Nama Barang:</h4></label>
     <input class="form-control" id="nama_barang" type="text" placeholder="Masukan nama barang" name="nama_item" value="{{.NamaItem}}">
     <label for="harga_barang" style="width: 100%; margin-top:20px;"><h4>Harga Barang:</h4></label>
