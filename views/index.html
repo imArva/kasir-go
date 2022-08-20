@@ -19,13 +19,13 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/additem">Add Item</a>
+            <a class="nav-link active" aria-current="page" href="/additem">Tambah Barang</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/data">Data</a>
+            <a class="nav-link active" aria-current="page" href="/data">Data Penjualan</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/edit">Edit</a>
+            <a class="nav-link active" aria-current="page" href="/edit">Edit Barang</a>
           </li>
         </ul>
         <form class="d-flex" role="search">
@@ -65,7 +65,7 @@
           <td><h4 id="total_output">0</h4></td>
           <td>
             <input type="button" value="Clear" onclick="clear_total()">
-            <input type="button" value="Done" onclick="hitung_total()">
+            <input type="button" value="Hitung" onclick="hitung_total()">
           </td>
       </tfoot>
     </table>
@@ -76,6 +76,7 @@
       let lastId = parseInt(document.getElementById("lastId").innerHTML);
 
       let total_harga = 0;
+      let data = [];
       function hitung_total() {
         for (let index = 1; index <= lastId; index++) {
           if (document.getElementById(`${index}text`) == null) {
@@ -84,9 +85,20 @@
           let text = document.getElementById(`${index}text`);
           let harga = document.getElementById(`${index}Harga`).innerHTML;
           total_harga += (parseInt(text.value) * parseInt(harga));
+          data.push({id: index, val: parseInt(text.value)})
         }
         document.getElementById("total_output").innerHTML = total_harga;
         total_harga = 0;
+
+        let insert_data = confirm("masukan data?")
+
+        if (insert_data) {
+          fetch("http://localhost:8080/postdata", {
+            method: "POST",
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify(data)
+          });
+        }
       }
 
       function clear_total() {

@@ -37,7 +37,8 @@ func main(){
 	app.Get("/delete/:id", Delete)
 
 	app.Post("/addprocess", postAddItem)
-        app.Post("/editprocess", postEdit)
+    app.Post("/editprocess", postEdit)
+    app.Post("/postdata", postData)
 
 	log.Fatal(app.Listen(":8080"))
 }
@@ -198,7 +199,7 @@ func postAddItem(c *fiber.Ctx) error {
 }
 
 func postEdit(c *fiber.Ctx) error {
-        id := c.FormValue("id")
+    id := c.FormValue("id")
 	nama_item := c.FormValue("nama_item")
 	harga_item := c.FormValue("harga_item")
 	harga_item_int,err  := strconv.Atoi(harga_item)
@@ -212,3 +213,28 @@ func postEdit(c *fiber.Ctx) error {
 	
 	return c.Redirect("/")
 }
+
+func postData(c *fiber.Ctx) error {
+	type data struct{
+		Id interface{} `json:"id"`
+		Val interface{} `json:"val"`
+	}
+
+	var datas []data
+
+	// fmt.Println(time.Now().Format("02-01-2006")) workin on per day sales :)
+
+	if err := c.BodyParser(&datas); err != nil{
+		c.SendString(err.Error())
+	}
+
+	for _, v := range datas {
+		_, err := db.Exec("UPDATE items SET jumlah_terjual= jumlah_terjual + ? WHERE id=?",v.Val, v.Id)
+		if err != nil {
+			c.SendString(err.Error())
+		}
+	}
+	
+	return c.Redirect("/")
+}
+
